@@ -36,15 +36,18 @@ import { Route as StudioRouteImport } from './routes/studio'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TransmissionsRouteImport } from './routes/transmissions'
 import { Route as WorkRouteImport } from './routes/work'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as JournalIndexRouteImport } from './routes/journal.index'
 import { Route as JournalSlugRouteImport } from './routes/journal.$slug'
 import { Route as LabIndexRouteImport } from './routes/lab.index'
 import { Route as LabSlugRouteImport } from './routes/lab.$slug'
 import { Route as OwnerIndexRouteImport } from './routes/owner.index'
+import { Route as OwnerAnalyticsRouteImport } from './routes/owner.analytics'
 import { Route as OwnerBotsRouteImport } from './routes/owner.bots'
 import { Route as OwnerInboxRouteImport } from './routes/owner.inbox'
 import { Route as OwnerJournalRouteImport } from './routes/owner.journal'
+import { Route as OwnerPromosRouteImport } from './routes/owner.promos'
 import { Route as OwnerReviewsRouteImport } from './routes/owner.reviews'
 import { Route as OwnerRunbookRouteImport } from './routes/owner.runbook'
 import { Route as OwnerSeoRouteImport } from './routes/owner.seo'
@@ -196,6 +199,11 @@ const WorkRoute = WorkRouteImport.update({
   path: '/work',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -226,6 +234,11 @@ const OwnerIndexRoute = OwnerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => OwnerRoute,
 } as any)
+const OwnerAnalyticsRoute = OwnerAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => OwnerRoute,
+} as any)
 const OwnerBotsRoute = OwnerBotsRouteImport.update({
   id: '/bots',
   path: '/bots',
@@ -239,6 +252,11 @@ const OwnerInboxRoute = OwnerInboxRouteImport.update({
 const OwnerJournalRoute = OwnerJournalRouteImport.update({
   id: '/journal',
   path: '/journal',
+  getParentRoute: () => OwnerRoute,
+} as any)
+const OwnerPromosRoute = OwnerPromosRouteImport.update({
+  id: '/promos',
+  path: '/promos',
   getParentRoute: () => OwnerRoute,
 } as any)
 const OwnerReviewsRoute = OwnerReviewsRouteImport.update({
@@ -345,12 +363,15 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/transmissions': typeof TransmissionsRoute
   '/work': typeof WorkRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/lab/$slug': typeof LabSlugRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bots': typeof OwnerBotsRoute
   '/owner/inbox': typeof OwnerInboxRoute
   '/owner/journal': typeof OwnerJournalRoute
+  '/owner/promos': typeof OwnerPromosRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/runbook': typeof OwnerRunbookRoute
   '/owner/seo': typeof OwnerSeoRoute
@@ -392,12 +413,15 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/terms': typeof TermsRoute
   '/transmissions': typeof TransmissionsRoute
+  '/api/health': typeof ApiHealthRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/lab/$slug': typeof LabSlugRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bots': typeof OwnerBotsRoute
   '/owner/inbox': typeof OwnerInboxRoute
   '/owner/journal': typeof OwnerJournalRoute
+  '/owner/promos': typeof OwnerPromosRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/runbook': typeof OwnerRunbookRoute
   '/owner/seo': typeof OwnerSeoRoute
@@ -446,12 +470,15 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/transmissions': typeof TransmissionsRoute
   '/work': typeof WorkRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/journal/$slug': typeof JournalSlugRoute
   '/lab/$slug': typeof LabSlugRoute
+  '/owner/analytics': typeof OwnerAnalyticsRoute
   '/owner/bots': typeof OwnerBotsRoute
   '/owner/inbox': typeof OwnerInboxRoute
   '/owner/journal': typeof OwnerJournalRoute
+  '/owner/promos': typeof OwnerPromosRoute
   '/owner/reviews': typeof OwnerReviewsRoute
   '/owner/runbook': typeof OwnerRunbookRoute
   '/owner/seo': typeof OwnerSeoRoute
@@ -501,12 +528,15 @@ export interface FileRouteTypes {
     | '/terms'
     | '/transmissions'
     | '/work'
+    | '/api/health'
     | '/blog/$slug'
     | '/journal/$slug'
     | '/lab/$slug'
+    | '/owner/analytics'
     | '/owner/bots'
     | '/owner/inbox'
     | '/owner/journal'
+    | '/owner/promos'
     | '/owner/reviews'
     | '/owner/runbook'
     | '/owner/seo'
@@ -548,12 +578,15 @@ export interface FileRouteTypes {
     | '/studio'
     | '/terms'
     | '/transmissions'
+    | '/api/health'
     | '/blog/$slug'
     | '/journal/$slug'
     | '/lab/$slug'
+    | '/owner/analytics'
     | '/owner/bots'
     | '/owner/inbox'
     | '/owner/journal'
+    | '/owner/promos'
     | '/owner/reviews'
     | '/owner/runbook'
     | '/owner/seo'
@@ -601,12 +634,15 @@ export interface FileRouteTypes {
     | '/terms'
     | '/transmissions'
     | '/work'
+    | '/api/health'
     | '/blog/$slug'
     | '/journal/$slug'
     | '/lab/$slug'
+    | '/owner/analytics'
     | '/owner/bots'
     | '/owner/inbox'
     | '/owner/journal'
+    | '/owner/promos'
     | '/owner/reviews'
     | '/owner/runbook'
     | '/owner/seo'
@@ -655,6 +691,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TransmissionsRoute: typeof TransmissionsRoute
   WorkRoute: typeof WorkRouteWithChildren
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -849,6 +886,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/$slug': {
       id: '/blog/$slug'
       path: '/$slug'
@@ -891,6 +935,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OwnerIndexRouteImport
       parentRoute: typeof OwnerRoute
     }
+    '/owner/analytics': {
+      id: '/owner/analytics'
+      path: '/analytics'
+      fullPath: '/owner/analytics'
+      preLoaderRoute: typeof OwnerAnalyticsRouteImport
+      parentRoute: typeof OwnerRoute
+    }
     '/owner/bots': {
       id: '/owner/bots'
       path: '/bots'
@@ -910,6 +961,13 @@ declare module '@tanstack/react-router' {
       path: '/journal'
       fullPath: '/owner/journal'
       preLoaderRoute: typeof OwnerJournalRouteImport
+      parentRoute: typeof OwnerRoute
+    }
+    '/owner/promos': {
+      id: '/owner/promos'
+      path: '/promos'
+      fullPath: '/owner/promos'
+      preLoaderRoute: typeof OwnerPromosRouteImport
       parentRoute: typeof OwnerRoute
     }
     '/owner/reviews': {
@@ -1056,9 +1114,11 @@ const LabRouteChildren: LabRouteChildren = {
 const LabRouteWithChildren = LabRoute._addFileChildren(LabRouteChildren)
 
 interface OwnerRouteChildren {
+  OwnerAnalyticsRoute: typeof OwnerAnalyticsRoute
   OwnerBotsRoute: typeof OwnerBotsRoute
   OwnerInboxRoute: typeof OwnerInboxRoute
   OwnerJournalRoute: typeof OwnerJournalRoute
+  OwnerPromosRoute: typeof OwnerPromosRoute
   OwnerReviewsRoute: typeof OwnerReviewsRoute
   OwnerRunbookRoute: typeof OwnerRunbookRoute
   OwnerSeoRoute: typeof OwnerSeoRoute
@@ -1070,9 +1130,11 @@ interface OwnerRouteChildren {
 }
 
 const OwnerRouteChildren: OwnerRouteChildren = {
+  OwnerAnalyticsRoute: OwnerAnalyticsRoute,
   OwnerBotsRoute: OwnerBotsRoute,
   OwnerInboxRoute: OwnerInboxRoute,
   OwnerJournalRoute: OwnerJournalRoute,
+  OwnerPromosRoute: OwnerPromosRoute,
   OwnerReviewsRoute: OwnerReviewsRoute,
   OwnerRunbookRoute: OwnerRunbookRoute,
   OwnerSeoRoute: OwnerSeoRoute,
@@ -1163,6 +1225,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TransmissionsRoute: TransmissionsRoute,
   WorkRoute: WorkRouteWithChildren,
+  ApiHealthRoute: ApiHealthRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

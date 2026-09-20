@@ -18,6 +18,7 @@ const LINKS = [
   { to: "/owner/services", label: "Services" },
   { to: "/owner/work", label: "Work" },
   { to: "/owner/store", label: "Store" },
+  { to: "/owner/promos", label: "Promos" },
   { to: "/owner/bots", label: "Bots" },
   { to: "/owner/journal", label: "Journal" },
   { to: "/owner/reviews", label: "Reviews" },

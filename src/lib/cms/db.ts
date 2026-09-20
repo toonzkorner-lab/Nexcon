@@ -566,6 +566,8 @@ export async function readInbox(): Promise<Inbox> {
       channel: String(r.channel ?? ""),
       total: num(r.total),
       items: asOrderItems(r.items),
+      couponCode: String(r.coupon_code ?? ""),
+      discount: num(r.discount),
       status: String(r.status),
       createdAt: String(r.created_at),
     })),
@@ -938,8 +940,8 @@ export async function insertOrder(input: Omit<Order, "id" | "status" | "createdA
   const sql = await getSql();
   const id = uid("ord");
   await sql.query(
-    `insert into orders (id, email, channel, total, items, status) values ($1,$2,$3,$4,$5::jsonb,'queued')`,
-    [id, input.email, input.channel, input.total, j(input.items)],
+    `insert into orders (id, email, channel, total, items, coupon_code, discount, status) values ($1,$2,$3,$4,$5::jsonb,$6,$7,'queued')`,
+    [id, input.email, input.channel, input.total, j(input.items), input.couponCode ?? "", input.discount ?? 0],
   );
   return { ...input, id, status: "queued", createdAt: new Date().toISOString() };
 }
@@ -967,3 +969,84 @@ export async function setRowStatus(
 }
 
 export { mapService, mapProject, mapProduct, mapPost, mapReview };
+
+/* ------------------------------ coupons ------------------------------ */
+
+export type CouponRow = {
+  id: string;
+  code: string;
+  kind: "percent" | "fixed";
+  value: number;
+  min_total: number;
+  max_uses: number | null;
+  used_count: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  active: boolean;
+  created_at: string;
+};
+
+function mapCoupon(r: Record<string, unknown>): CouponRow {
+  return {
+    id: String(r.id),
+    code: String(r.code),
+    kind: r.kind === "fixed" ? "fixed" : "percent",
+    value: num(r.value),
+    min_total: num(r.min_total),
+    max_uses: r.max_uses === null ? null : Number(r.max_uses),
+    used_count: Number(r.used_count ?? 0),
+    starts_at: r.starts_at ? String(r.starts_at) : null,
+    ends_at: r.ends_at ? String(r.ends_at) : null,
+    active: Boolean(r.active),
+    created_at: String(r.created_at),
+  };
+}
+
+export async function listCoupons(): Promise<CouponRow[]> {
+  const sql = await getSql();
+  const rows = await sql.query<Record<string, unknown>>("select * from coupons order by created_at desc");
+  return rows.map(mapCoupon);
+}
+
+export async function findCoupon(code: string): Promise<CouponRow | null> {
+  const sql = await getSql();
+  const rows = await sql.query<Record<string, unknown>>("select * from coupons where code = $1 limit 1", [code]);
+  return rows.length ? mapCoupon(rows[0]!) : null;
+}
+
+export async function upsertCoupon(c: Omit<CouponRow, "id" | "used_count" | "created_at"> & { id?: string }): Promise<void> {
+  const sql = await getSql();
+  await sql.query(
+    `insert into coupons (code, kind, value, min_total, max_uses, starts_at, ends_at, active)
+     values ($1,$2,$3,$4,$5,$6,$7,$8)
+     on conflict (code) do update set
+       kind=excluded.kind, value=excluded.value, min_total=excluded.min_total,
+       max_uses=excluded.max_uses, starts_at=excluded.starts_at, ends_at=excluded.ends_at,
+       active=excluded.active`,
+    [c.code, c.kind, c.value, c.min_total, c.max_uses, c.starts_at, c.ends_at, c.active],
+  );
+}
+
+export async function deleteCoupon(code: string): Promise<void> {
+  const sql = await getSql();
+  await sql.query("delete from coupons where code = $1", [code]);
+}
+
+/**
+ * Atomically consume one use of a coupon, guarded by the same rules the
+ * public validator checks. Returns false when the coupon is not usable
+ * (so a checkout racing the last use cannot overshoot max_uses).
+ */
+export async function consumeCoupon(code: string): Promise<boolean> {
+  const sql = await getSql();
+  const rows = await sql.query<{ ok: boolean }>(
+    `update coupons set used_count = used_count + 1
+     where code = $1 and active
+       and (starts_at is null or starts_at <= now())
+       and (ends_at is null or ends_at >= now())
+       and (max_uses is null or used_count < max_uses)
+     returning true as ok`,
+    [code],
+  );
+  return rows.length > 0;
+}

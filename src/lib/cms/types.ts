@@ -162,6 +162,8 @@ export type Order = {
   channel: string;
   total: number;
   items: { name: string; qty: number; price: number }[];
+  couponCode: string;
+  discount: number;
   status: string;
   createdAt: string;
 };

@@ -1,7 +1,8 @@
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
+import { validateCoupon } from "@/lib/owner-coupons";
 import { PageHeader } from "@/components/site/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,39 @@ function CartPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const total = cartTotal(items);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const finalTotal = Math.max(0, Math.round((total - (coupon?.discount ?? 0)) * 100) / 100);
+
+  async function applyCoupon(code: string) {
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    setCouponBusy(true);
+    setCouponError(null);
+    try {
+      const res = await validateCoupon({ data: { code: trimmed, subtotal: total } });
+      if (res.ok) {
+        setCoupon({ code: res.code, discount: res.discount });
+        trackAnalyticsEvent("promo_applied");
+      } else {
+        setCoupon(null);
+        setCouponError(res.error);
+      }
+    } catch {
+      setCouponError("Could not check that code right now.");
+    } finally {
+      setCouponBusy(false);
+    }
+  }
+
+  // Re-check the applied code when the cart changes so the discount line
+  // never shows a stale number; the server still revalidates at checkout.
+  useEffect(() => {
+    if (coupon && !couponBusy) void applyCoupon(coupon.code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total]);
 
   async function checkout(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,6 +85,7 @@ function CartPage() {
           channel,
           total,
           items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
+          coupon: coupon?.code,
         },
       });
       clear();
@@ -127,7 +162,43 @@ function CartPage() {
         </div>
         <form onSubmit={(e) => void checkout(e)} className="h-fit space-y-4 rounded-[var(--radius-xl)] bg-bg-elevated p-6">
           <p className="font-mono text-[11px] uppercase tracking-wider text-fg-subtle">Transmit</p>
-          <p className="font-mono text-2xl tabular-nums">{formatUsd(total)}</p>
+          <div className="space-y-1 font-mono tabular-nums">
+            <div className="flex justify-between text-sm text-fg-muted">
+              <span>Subtotal</span>
+              <span>{formatUsd(total)}</span>
+            </div>
+            {coupon && coupon.discount > 0 && (
+              <div className="flex justify-between text-sm text-signal">
+                <span>Promo {coupon.code}</span>
+                <span>−{formatUsd(coupon.discount)}</span>
+              </div>
+            )}
+            <p className="text-2xl">{formatUsd(finalTotal)}</p>
+          </div>
+          <div>
+            <Label htmlFor="coupon">Promo code</Label>
+            <div className="flex gap-2">
+              <Input
+                id="coupon"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                placeholder="WELCOME10"
+                className="uppercase"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={couponBusy || !couponInput.trim()}
+                onClick={() => void applyCoupon(couponInput)}
+              >
+                {couponBusy ? "…" : "Apply"}
+              </Button>
+            </div>
+            {couponError && <p className="mt-1 text-xs text-red-400">{couponError}</p>}
+            {coupon && !couponError && (
+              <p className="mt-1 text-xs text-signal">Code {coupon.code} applied.</p>
+            )}
+          </div>
           <div>
             <Label htmlFor="email">Email</Label>
             <Input id="email" name="email" type="email" required />

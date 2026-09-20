@@ -29,6 +29,7 @@ const EVENT_NAMES = [
   "order_complete",
   "bot_demo_start",
   "service_inquiry",
+  "promo_applied",
 ] as const;
 
 const eventSchema = z.object({

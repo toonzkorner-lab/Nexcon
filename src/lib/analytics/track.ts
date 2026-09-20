@@ -19,7 +19,7 @@ function sessionId(): string {
 
 /** Fire-and-forget conversion event (contact submit, order, bot demo…). */
 export function trackAnalyticsEvent(
-  event: "contact_submit" | "order_complete" | "bot_demo_start" | "service_inquiry",
+  event: "contact_submit" | "order_complete" | "bot_demo_start" | "service_inquiry" | "promo_applied",
 ) {
   try {
     if (

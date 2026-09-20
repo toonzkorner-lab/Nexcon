@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { insertBrief, insertMessage, insertOrder, insertReview, readSite } from "./db";
+import { applyCouponToOrder } from "@/lib/owner-coupons";
 
 export const loadSite = createServerFn({ method: "GET" }).handler(async () => {
   return readSite(true);
@@ -90,12 +91,13 @@ export const submitOrder = createServerFn({ method: "POST" })
             price: z.number().nonnegative(),
           }),
         ).min(1).max(40),
+        coupon: z.string().trim().max(24).optional(),
         website: websiteHoneypot,
       }).parse(input),
   )
   .handler(async ({ data }) => {
     limitCaller("form:order", 5);
-    const { website, ...rest } = data;
+    const { website, coupon, ...rest } = data;
     if (website) return { ...honeypotOk(), ...rest, total: 0 };
 
     // Recompute the total from authoritative product prices. Client prices
@@ -120,7 +122,17 @@ export const submitOrder = createServerFn({ method: "POST" })
           `for ${rest.email}; using server total`,
       );
     }
-    return insertOrder({ ...rest, items, total: serverTotal });
+    // Coupons are revalidated against the server-side subtotal; the discount
+    // is never trusted from the client.
+    const applied = await applyCouponToOrder(coupon, serverTotal);
+    const finalTotal = Math.round((serverTotal - applied.discount) * 100) / 100;
+    return insertOrder({
+      ...rest,
+      items,
+      total: finalTotal,
+      couponCode: applied.code,
+      discount: applied.discount,
+    });
   });
 
 export const submitReview = createServerFn({ method: "POST" })

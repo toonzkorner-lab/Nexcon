@@ -101,6 +101,11 @@ function InboxPage() {
                       {i.qty} × {i.name} — {formatUsd(i.price)}
                     </li>
                   ))}
+                  {o.couponCode && (
+                    <li className="text-signal">
+                      Promo {o.couponCode} — −{formatUsd(o.discount)}
+                    </li>
+                  )}
                 </ul>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {["queued", "fulfilled", "cancelled"].map((s) => (

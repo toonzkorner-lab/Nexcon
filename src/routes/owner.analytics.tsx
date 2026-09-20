@@ -22,6 +22,7 @@ const EVENT_LABELS: Record<string, string> = {
   order_complete: "Orders placed",
   bot_demo_start: "Bot demos started",
   service_inquiry: "Service inquiries",
+  promo_applied: "Promo codes applied",
 };
 
 function Page() {
