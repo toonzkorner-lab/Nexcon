@@ -1,6 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { PageHeader } from "@/components/site/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ function ContactPage() {
         data: { name, email, topic: topic || "General", body },
       });
       setSent(row.id);
+      trackAnalyticsEvent("contact_submit");
       toast.success("Message at the desk. We answer within 24 hours on weekdays.");
       e.currentTarget.reset();
       await router.invalidate();

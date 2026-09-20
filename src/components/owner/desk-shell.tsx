@@ -13,6 +13,7 @@ export type DeskContext = {
 
 const LINKS = [
   { to: "/owner", label: "Overview", exact: true },
+  { to: "/owner/analytics", label: "Analytics" },
   { to: "/owner/inbox", label: "Inbox" },
   { to: "/owner/services", label: "Services" },
   { to: "/owner/work", label: "Work" },

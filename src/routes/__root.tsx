@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "sonner";
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { RegisterPwa } from "@/components/pwa/register";
 import { Shell } from "@/components/site/shell";
@@ -71,6 +72,7 @@ function Root() {
       <body>
         <PreviewHostBridge />
         <RegisterPwa />
+        <AnalyticsTracker />
         <AuthProvider>
           <Shell>
             <Outlet />

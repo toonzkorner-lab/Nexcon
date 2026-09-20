@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { talkToBot } from "@/lib/ai/chat";
 import type { ShowcaseBot } from "@/lib/cms/types";
 import { freshLedger, parseCommand, runEconomy, type Ledger } from "@/lib/lab/economy";
@@ -20,6 +21,7 @@ export function BotPlayground({ bot }: { bot: ShowcaseBot }) {
   const [ledger, setLedger] = useState<Ledger>(freshLedger);
   const [house, setHouse] = useState<House>(freshHouse);
   const scroller = useRef<HTMLDivElement>(null);
+  const tracked = useRef(false);
   const turns = messages.filter((m) => m.role === "user").length;
   const localKind = bot.kind === "economy" || bot.kind === "casino";
   const capped = turns >= MAX_TURNS;
@@ -34,6 +36,10 @@ export function BotPlayground({ bot }: { bot: ShowcaseBot }) {
     if (!text || busy) return;
     const slash = parseCommand(text);
     if (capped && !(localKind && slash)) return;
+    if (!tracked.current) {
+      tracked.current = true;
+      trackAnalyticsEvent("bot_demo_start");
+    }
     setDraft("");
     setError(null);
 

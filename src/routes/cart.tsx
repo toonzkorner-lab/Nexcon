@@ -1,6 +1,7 @@
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { PageHeader } from "@/components/site/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,7 @@ function CartPage() {
       });
       clear();
       setOrderId(row.id);
+      trackAnalyticsEvent("order_complete");
       toast.success("Order queued for fulfillment.");
       await router.invalidate();
     } catch {
