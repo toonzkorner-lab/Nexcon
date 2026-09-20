@@ -32,8 +32,15 @@ COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/migrations ./migrations
 RUN npm init -y >/dev/null 2>&1 && npm install --no-save --no-audit --no-fund pg
 
+# Coolify's own healthcheck execs `curl` (or `wget`) inside the container, so the
+# runtime image must ship one — node:*-slim does not. Without it Coolify marks
+# every deploy unhealthy even though the server is up.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
+
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
-  CMD node -e "fetch('http://127.0.0.1:3000/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+  CMD curl -fsS http://127.0.0.1:3000/api/health > /dev/null
 
 # migrate.mjs skips itself when DATABASE_URL is unset (PGLite fallback
 # migrates itself instead). Idempotent: recorded in _migrations, safe to re-run.
