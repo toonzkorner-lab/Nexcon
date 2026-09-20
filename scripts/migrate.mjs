@@ -42,7 +42,15 @@ async function main() {
     return;
   }
 
-  const pool = new pg.Pool({ connectionString: databaseUrl, max: 1 });
+  // Fail fast on a dead DATABASE_URL: node-postgres defaults to NO connect
+  // timeout, which would hang container startup forever (server never boots,
+  // healthcheck fails with no useful log). 15s is generous for a DB on the
+  // same host/network; an unreachable one should crash loudly instead.
+  const pool = new pg.Pool({
+    connectionString: databaseUrl,
+    max: 1,
+    connectionTimeoutMillis: 15000,
+  });
   const client = await pool.connect();
   try {
     await client.query(
