@@ -145,8 +145,19 @@ const database = databaseUrl
   ? new Pool({ connectionString: databaseUrl })
   : { dialect: pgliteDialect(() => getPglite()), type: "postgres" as const };
 
+// Whether session cookies can carry the `Secure` attribute. Derived from the
+// public base URL: deployments reached over plain HTTP (e.g. a temporary test
+// address without TLS) need non-secure cookies, otherwise browsers silently
+// drop the session and sign-in appears to do nothing. Defaults to true —
+// localhost and the HTTPS preview/production deployments keep Secure cookies
+// (browsers allow Secure cookies on http://localhost).
+const cookieSecure = explicitBaseURL ? explicitBaseURL.startsWith("https://") : true;
+// `__Host-` cookie-name prefix requires the Secure attribute; drop it when
+// cookies are non-secure so plain-HTTP deployments still get a working session.
+const cookiePrefix = cookieSecure ? "__Host-" : "";
+
 /** Session token cookie name — also read by the live-preview popup completion page. */
-export const SESSION_TOKEN_COOKIE = "__Host-grok-auth.session_token";
+export const SESSION_TOKEN_COOKIE = `${cookiePrefix}grok-auth.session_token`;
 
 // Built separately so the `betterAuth({...})` call stays easy to edit without
 // breaking brackets (models often trip on the conditional plugin spread).
@@ -219,15 +230,17 @@ export const auth = betterAuth({
   // Path=/ + no Domain; Better Auth otherwise uses `__Secure-` (which permits
   // Domain), so we drop its auto prefix (`useSecureCookies: false`) and set
   // Secure + the names ourselves. (Browsers allow Secure cookies on
-  // `http://localhost`, so local dev still works.)
+  // `http://localhost`, so local dev still works.) `cookieSecure` follows the
+  // public base URL so plain-HTTP test deployments get non-secure cookies and
+  // working sessions instead of silently dropped sign-ins.
   advanced: {
     useSecureCookies: false,
-    defaultCookieAttributes: { secure: true, sameSite: "lax", path: "/" },
+    defaultCookieAttributes: { secure: cookieSecure, sameSite: "lax", path: "/" },
     cookies: {
       session_token: { name: SESSION_TOKEN_COOKIE },
-      session_data: { name: "__Host-grok-auth.session_data" },
-      account_data: { name: "__Host-grok-auth.account_data" },
-      dont_remember: { name: "__Host-grok-auth.dont_remember" },
+      session_data: { name: `${cookiePrefix}grok-auth.session_data` },
+      account_data: { name: `${cookiePrefix}grok-auth.account_data` },
+      dont_remember: { name: `${cookiePrefix}grok-auth.dont_remember` },
     },
   },
 
