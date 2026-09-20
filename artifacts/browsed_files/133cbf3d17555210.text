@@ -1,0 +1,11 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /book/
+
+Sitemap: https://n3xuskonc3ptz.com/sitemap.xml

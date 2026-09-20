@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#090a0b" />
+    <title>Offline · N3xUs</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; min-height: 100dvh; background: #090a0b; color: #eceeeb; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; }
+      main { min-height: 100dvh; display: grid; place-items: center; padding: 2rem; padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+      .mark { width: 40px; height: 40px; }
+      h1 { font-weight: 300; letter-spacing: -0.03em; font-size: 1.75rem; margin: 1.25rem 0 0; }
+      p { color: #8b918c; font-size: 0.95rem; line-height: 1.55; max-width: 28rem; }
+      button { margin-top: 1.5rem; height: 44px; padding: 0 1rem; border: 0; border-radius: 12px; background: #d7e0d8; color: #090a0b; font: 500 0.875rem/1 "IBM Plex Sans", system-ui, sans-serif; cursor: pointer; }
+      .kicker { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #616662; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div>
+        <p class="kicker">N3xUs</p>
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true" style="margin-top:1rem">
+          <rect width="32" height="32" fill="#090a0b"/>
+          <rect x="1" y="1" width="30" height="30" fill="none" stroke="#eceeeb" stroke-opacity="0.08"/>
+          <rect x="6" y="6" width="6" height="20" fill="#eceeeb"/>
+          <rect x="20" y="6" width="6" height="20" fill="#eceeeb"/>
+          <polygon points="12,6 18,6 26,26 20,26" fill="#7f9a8c"/>
+        </svg>
+        <h1>The line is down.</h1>
+        <p>This shell is still installed. Catalog, lab, and the desk need a network. Reconnect and try again.</p>
+        <button type="button" onclick="location.reload()">Retry</button>
+      </div>
+    </main>
+  </body>
+</html>

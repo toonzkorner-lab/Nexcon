@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "N3xUs Konc3pt'z — Web Design, Development & Hosting",
+      "hasCanvas": false,
+      "bodyTextLen": 4262,
+      "bodyTextHash": "b0cd1ad63b6e08dd29629c06ebec9dbbb18b56c50aa28d7aaa8fec1b8b367732",
+      "bodyTextPrefix": "Skip to content ○ AFTER HOURS · 18:39 CST MON–FRI 09:00–18:00 · ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/seo-home.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "N3xUs Konc3pt'z — Web Design, Development & Hosting",
+      "hasCanvas": false,
+      "bodyTextLen": 4086,
+      "bodyTextHash": "aed30c616f2a9518a71e72926d912182b3e7a4c71782faf299572efaf70a9c4e",
+      "bodyTextPrefix": "Skip to content N3xUs STUDIO · SOUTH TEXAS Design. Development. ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/seo-home-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/seo-home.json"
+}

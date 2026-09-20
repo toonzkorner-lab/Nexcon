@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/services/web-development",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Web Development · N3xUs Konc3pt'z",
+      "hasCanvas": false,
+      "bodyTextLen": 1387,
+      "bodyTextHash": "5bb726a7c95222fec5df653c33b6d594c383e6de59afae8255dd10331e942f14",
+      "bodyTextPrefix": "Skip to content ○ AFTER HOURS · 18:39 CST MON–FRI 09:00–18:00 · ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/seo-service.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Web Development · N3xUs Konc3pt'z",
+      "hasCanvas": false,
+      "bodyTextLen": 1245,
+      "bodyTextHash": "c579148f9b6fb1cbd881cf49850cf26dce233e972ca65f2c511980fdd16e2fc8",
+      "bodyTextPrefix": "Skip to content N3xUs HOME / SERVICES / WEB DEVELOPMENT Services",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/seo-service-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/seo-service.json"
+}

@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "N3xUs Konc3pt'z",
+      "hasCanvas": false,
+      "bodyTextLen": 3571,
+      "bodyTextHash": "65e81364afce3e1bb9e52829bd7c4d8c9df59e472fdbd08b335d6762516e09e7",
+      "bodyTextPrefix": "N3xUs Work Services Store Journal Studio CST --:--:-- K Open a b",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "N3xUs Konc3pt'z",
+      "hasCanvas": false,
+      "bodyTextLen": 3483,
+      "bodyTextHash": "55fcbb2374bea55e176e9ac7426bb1ecc2007ee61bdfc32c9b0b0b83f057793c",
+      "bodyTextPrefix": "N3xUs STUDIO · SOUTH TEXAS Design. Development. Deployment. N3xU",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": false,
+  "baselineReasons": []
+}

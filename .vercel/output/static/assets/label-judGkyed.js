@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-NZYk81nU.js";import{t}from"./utils-DRfTzjaM.js";var n=e();function r({className:e,...r}){return(0,n.jsx)(`label`,{className:t(`block text-xs font-medium tracking-wide text-fg-muted mb-1.5`,e),...r})}export{r as t};
