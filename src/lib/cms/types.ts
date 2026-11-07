@@ -166,6 +166,10 @@ export type Order = {
   discount: number;
   status: string;
   createdAt: string;
+  /** Square (or other provider) payment id that settled this order, if paid. */
+  paymentId?: string;
+  /** Payment provider, e.g. "square". Empty for unpaid/queue-only orders. */
+  paymentProvider?: string;
 };
 
 export type BotCommand = { cmd: string; hint: string };
