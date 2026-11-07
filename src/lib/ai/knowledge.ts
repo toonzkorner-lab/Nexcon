@@ -227,6 +227,279 @@ export const CODING_KNOWLEDGE: KnowledgeEntry[] = [
     answer:
       "A bot is a program that talks to people on a platform — Discord, Telegram, or a website — and does jobs for them: answering questions, taking orders, running games, or handling support. The ones we build answer from your real data (hours, prices, products) instead of guessing.",
   },
+  {
+    id: "python",
+    topic: "Python",
+    triggers: ["what is python", "python", "learn python", "python programming", "python vs javascript"],
+    answer:
+      "Python is a general-purpose language known for readable, beginner-friendly code. It powers web backends, data work, automation scripts, and bots — including Telegram bots. If JavaScript is the language of the browser, Python is the workhorse behind the scenes.",
+  },
+  {
+    id: "conditionals",
+    topic: "If / else",
+    triggers: ["if else", "if statement", "conditional", "if else statement", "else if"],
+    answer:
+      "An if statement runs code only when a condition is true: if (age >= 18) { ... } else { ... }. The else branch runs when the condition is false. Chain else if for more than two outcomes. Keep conditions simple — if you nest three deep, split it into a function.",
+  },
+  {
+    id: "loops",
+    topic: "Loops",
+    triggers: ["for loop", "while loop", "loop", "how to loop", "iterate", "for each"],
+    answer:
+      "A loop repeats code. A for loop runs a set number of times: for (let i = 0; i < 5; i++). A while loop runs until a condition turns false. For arrays, prefer for...of or .forEach over counting indexes by hand — fewer off-by-one mistakes.",
+  },
+  {
+    id: "strings",
+    topic: "Strings",
+    triggers: ["string", "template literal", "string interpolation", "concatenate", "string methods"],
+    answer:
+      "A string is text in quotes: const s = \"hello\";. Template literals use backticks and let you embed values: `Hello, ${name}`. Common helpers: .length, .toUpperCase(), .includes(), .split(). Strings are immutable — methods return a new string, they never change the original.",
+  },
+  {
+    id: "booleans-logic",
+    topic: "Booleans and logic",
+    triggers: ["boolean", "true false", "logical operators", "and or not", "boolean logic"],
+    answer:
+      "A boolean is true or false. Combine them with && (and — both must be true), || (or — at least one true), and ! (not — flips it). A common bug: using = (assign) where you meant === (compare). Triple equals checks value and type; double equals can coerce types and surprise you.",
+  },
+  {
+    id: "error-handling",
+    topic: "Try / catch",
+    triggers: ["try catch", "error handling", "handle errors", "throw an error", "catch error"],
+    answer:
+      "Wrap risky code in try/catch so one failure does not crash everything: try { await fetch(url); } catch (err) { console.error(err); }. Use try/catch around network calls, file reads, and JSON parsing — the places that fail in the real world. Log the error, then decide: retry, fall back, or tell the user.",
+  },
+  {
+    id: "classes-oop",
+    topic: "Classes and OOP",
+    triggers: ["class", "oop", "object oriented", "what is a class", "constructor"],
+    answer:
+      "A class is a blueprint for creating objects with the same shape and behavior. You define properties (data) and methods (functions) once, then make instances: const user = new User(\"Juan\");. OOP groups data and the code that works on it together. You do not need classes for everything — plain functions and objects cover most small jobs.",
+  },
+  {
+    id: "modules-imports",
+    topic: "Modules and imports",
+    triggers: ["import", "export", "module", "how to import", "require vs import"],
+    answer:
+      "Modules split code across files so each file does one job. Export what a file provides: export function greet() {}. Import it where you need it: import { greet } from \"./greet.js\";. Use ESM import/export in modern projects; require() is the older CommonJS style. A circular import (A imports B, B imports A) is a sign the shared code belongs in a third file.",
+  },
+  {
+    id: "json-deep",
+    topic: "JSON",
+    triggers: ["json parse", "json stringify", "parse json", "json.stringify", "json format"],
+    answer:
+      "JSON is the text format APIs use to send data. JSON.parse(text) turns a JSON string into a JavaScript object; JSON.stringify(obj) turns an object back into a string. Keys must use double quotes and there are no trailing commas — that is why hand-written JSON breaks so often. Validate with a JSON linter when a parse fails.",
+  },
+  {
+    id: "regex",
+    topic: "Regular expressions",
+    triggers: ["regex", "regular expression", "pattern matching", "validate email regex", "what is regex", "what is a regex"],
+    answer:
+      "A regular expression (regex) is a pattern for matching text: /\\d+/ matches digits, /^\\S+@\\S+\\.\\S+$/ is a rough email check. Use them for validation and search, not for parsing HTML or nested data — that way lies madness. Test your pattern on regex101.com before shipping it.",
+  },
+  {
+    id: "http-status-codes",
+    topic: "HTTP status codes",
+    triggers: ["http status", "status code", "404 error", "404 not found", "what is 404", "500 error", "500 internal", "403 forbidden", "401 unauthorized", "200 ok"],
+    answer:
+      "Status codes say what happened: 2xx means success (200 OK), 3xx means redirect, 4xx means the client messed up (404 not found, 401 not logged in, 403 not allowed), 5xx means the server messed up (500 internal error). When debugging, the code tells you which side to look at first — 4xx is your request, 5xx is their server.",
+  },
+  {
+    id: "http-methods",
+    topic: "HTTP methods",
+    triggers: ["http methods", "get vs post", "get post put delete", "what is get", "what is post"],
+    answer:
+      "HTTP methods say what you want to do: GET reads data, POST creates it, PUT/PATCH updates it, DELETE removes it. GET requests should never change anything — that is what makes them safe to retry and cache. A form that creates something should POST; a link that only reads should GET.",
+  },
+  {
+    id: "cors",
+    topic: "CORS",
+    triggers: ["cors", "cors error", "blocked by cors", "access control allow origin", "cross origin", "what is cors"],
+    answer:
+      "CORS is the browser blocking a page from calling an API on a different domain unless that API explicitly allows it. The fix lives on the server: it must send an Access-Control-Allow-Origin header for your domain. During development you can use a proxy, but do not ship a browser extension workaround as the fix.",
+  },
+  {
+    id: "frontend-backend",
+    topic: "Frontend vs backend",
+    triggers: ["frontend vs backend", "front end vs back end", "what is frontend", "what is backend", "client vs server"],
+    answer:
+      "Frontend is what runs in the browser — what the user sees and clicks. Backend is what runs on a server — the database, the logic, the APIs. The frontend asks, the backend answers. A full-stack developer does both sides.",
+  },
+  {
+    id: "full-stack",
+    topic: "Full-stack",
+    triggers: ["full stack", "fullstack", "what is full stack", "full stack developer"],
+    answer:
+      "Full-stack means building both the frontend (what users see) and the backend (server, database, APIs) of an app. A typical stack: React on the front, Node.js and Postgres on the back. You do not need to master every layer to ship — know one end well and the other well enough to connect them.",
+  },
+  {
+    id: "what-is-server",
+    topic: "What a server is",
+    triggers: ["what is a server", "server", "what does a server do", "web server"],
+    answer:
+      "A server is a computer (or program) that answers requests from other computers. Your browser asks a web server for a page; the server sends it back. Servers stay on and reachable, which is why a bot or an API needs one. Your laptop can be a server for testing, but a hosted one is what the public reaches.",
+  },
+  {
+    id: "static-vs-dynamic",
+    topic: "Static vs dynamic sites",
+    triggers: ["static vs dynamic", "static site", "dynamic site", "static website"],
+    answer:
+      "A static site is fixed files — fast, cheap, and great for landing pages and blogs. A dynamic site builds pages per request from a database — needed for logins, carts, and dashboards. Most real projects mix both: static pages for marketing, dynamic routes for the app itself.",
+  },
+  {
+    id: "domains-dns",
+    topic: "Domains and DNS",
+    triggers: ["domain", "dns", "what is dns", "how does a domain work", "nameserver", "point domain", "dns work"],
+    answer:
+      "A domain is a human name for an IP address. DNS is the lookup: when you type a domain, DNS returns the server's IP. To point a domain at a host, you set DNS records (usually an A record or CNAME) at your registrar. Changes take minutes to hours to spread worldwide — that delay is DNS propagation.",
+  },
+  {
+    id: "ssl-https",
+    topic: "SSL and HTTPS",
+    triggers: ["ssl", "https", "certificate", "what is https", "secure connection", "tls"],
+    answer:
+      "HTTPS encrypts traffic between the browser and the server so no one in between can read or change it. The padlock comes from a certificate proving the site owns the domain. Modern hosts (Vercel, Netlify) issue certificates automatically — you only need to point the DNS at them. Never collect logins or payments over plain HTTP.",
+  },
+  {
+    id: "seo-basics",
+    topic: "SEO basics",
+    triggers: ["seo", "search engine", "rank on google", "how to rank", "meta tags"],
+    answer:
+      "SEO is making your pages easy for search engines to find, understand, and rank. The basics: one clear title per page, a short description, real headings, fast loading, and pages that work on mobile. Add a sitemap and Open Graph tags so links look right when shared. Content that answers a real question beats keyword tricks every time.",
+  },
+  {
+    id: "cookies-sessions",
+    topic: "Cookies and sessions",
+    triggers: ["cookie", "cookies", "session", "what is a cookie", "session cookie"],
+    answer:
+      "A cookie is a small piece of data the browser stores and sends back with each request. Sessions use a cookie holding an ID; the server keeps the real data (like who is logged in) keyed by that ID. Mark auth cookies HttpOnly (JavaScript cannot read them) and Secure (only over HTTPS). That is most of login security in one paragraph.",
+  },
+  {
+    id: "localstorage",
+    topic: "localStorage",
+    triggers: ["localstorage", "local storage", "sessionstorage", "store data in browser", "in localstorage"],
+    answer:
+      "localStorage lets a web page save small data in the browser that survives reloads: localStorage.setItem(\"theme\", \"dark\");. It holds strings only, about 5 MB, and it is per-domain. Never store secrets or tokens there — any script on the page can read it. For anything sensitive, use HttpOnly cookies instead.",
+  },
+  {
+    id: "forms-validation",
+    topic: "Forms and validation",
+    triggers: ["form", "form validation", "validate input", "html form", "submit form"],
+    answer:
+      "Validate in two places: the browser (fast feedback, required fields, input types) and the server (the real check — never trust the browser alone). Check that required fields are present, emails look like emails, and text is within length limits. Show one clear error per field, next to the field, in plain words.",
+  },
+  {
+    id: "accessibility",
+    topic: "Accessibility",
+    triggers: ["accessibility", "a11y", "screen reader", "aria", "accessible website"],
+    answer:
+      "Accessibility means people using keyboards, screen readers, or high contrast can use your site. The cheap wins: real buttons and links (not divs), alt text on images, labels on every input, and enough color contrast. Test by tabbing through the page with only a keyboard — if you cannot reach it, neither can they.",
+  },
+  {
+    id: "sql-select",
+    topic: "SQL SELECT",
+    triggers: ["sql select", "select query", "sql where", "how to query", "select from"],
+    answer:
+      "SELECT reads rows from a table: SELECT name, email FROM users WHERE active = true ORDER BY created_at DESC LIMIT 10;. WHERE filters, ORDER BY sorts, LIMIT caps the count. Start by selecting only the columns you need — SELECT * is fine for exploring, wasteful in production.",
+  },
+  {
+    id: "sql-joins",
+    topic: "SQL JOINs",
+    triggers: ["sql join", "join tables", "inner join", "left join", "how to join", "join two tables", "tables in sql"],
+    answer:
+      "A JOIN combines rows from two tables on a shared key: SELECT orders.id, users.name FROM orders JOIN users ON orders.user_id = users.id;. INNER JOIN keeps only rows that match on both sides; LEFT JOIN keeps all rows from the left table and fills in nulls where there is no match. If your result has duplicate rows, you probably joined on the wrong key.",
+  },
+  {
+    id: "nosql-vs-sql",
+    topic: "NoSQL vs SQL",
+    triggers: ["nosql", "nosql vs sql", "mongodb", "sql vs nosql", "document database"],
+    answer:
+      "SQL databases (Postgres, MySQL) store data in tables with a fixed schema and strong guarantees — the safe default for orders, users, and money. NoSQL (MongoDB, Firebase) stores flexible documents and scales by sharding — handy for logs, feeds, and fast-changing shapes. Pick SQL unless you have a specific reason not to.",
+  },
+  {
+    id: "password-hashing",
+    topic: "Password hashing",
+    triggers: ["hash password", "password hashing", "bcrypt", "store passwords", "salt", "hash a password", "hash passwords"],
+    answer:
+      "Never store a password as plain text. Hash it with a slow algorithm like bcrypt or argon2, which turns the password into a scrambled value that cannot be reversed. When the user logs in, hash what they typed and compare the hashes. Add a unique salt per user so identical passwords do not produce identical hashes.",
+  },
+  {
+    id: "jwt-auth",
+    topic: "JWT",
+    triggers: ["jwt", "json web token", "token auth", "bearer token", "what is jwt", "what is a jwt"],
+    answer:
+      "A JWT is a signed token that proves who you are: the server signs it with a secret, and anyone can verify the signature without asking the server. The client sends it as an Authorization: Bearer <token> header. Keep JWTs short-lived (minutes to hours) and store them in HttpOnly cookies, not localStorage.",
+  },
+  {
+    id: "auth-vs-authz",
+    topic: "Auth vs authorization",
+    triggers: ["authentication vs authorization", "auth vs authz", "what is authentication", "what is authorization"],
+    answer:
+      "Authentication is proving who you are (logging in). Authorization is proving you are allowed to do a thing (an owner can edit, a visitor cannot). Log in first, then check permissions on every request — never trust the client to tell you what role it has.",
+  },
+  {
+    id: "testing",
+    topic: "Testing",
+    triggers: ["testing", "unit test", "write a test", "how to test", "test driven"],
+    answer:
+      "A test calls your code with a known input and checks the output. Start with unit tests on pure functions (price math, validation, formatting) — they are fast and catch regressions. A good test names what it proves: \"coupon over max uses is rejected\". Run them before every push; a test you do not run is a comment.",
+  },
+  {
+    id: "terminal-cli",
+    topic: "Terminal",
+    triggers: ["terminal", "command line", "cli", "how to use terminal", "use the terminal", "bash", "command prompt"],
+    answer:
+      "The terminal runs commands by text. The essentials: cd to move, ls to list, mkdir to make a folder, and Tab to autocomplete. Commands are case-sensitive and a typo is the most common error. If a command asks for a password, nothing shows while you type — that is normal.",
+  },
+  {
+    id: "vscode",
+    topic: "VS Code",
+    triggers: ["vscode", "vs code", "code editor", "best editor"],
+    answer:
+      "VS Code is the most common editor for web work. Learn the shortcuts that save the most time: Ctrl+P to open any file, Ctrl+Shift+P for every command, and Ctrl+` to toggle the terminal. Install the extensions for your language (ESLint, Prettier) and format on save — it ends most style arguments.",
+  },
+  {
+    id: "dates-time",
+    topic: "Dates and time",
+    triggers: ["date", "time", "timezone", "datetime", "how to handle dates", "timestamp"],
+    answer:
+      "Store dates in UTC and convert to the user's timezone only when displaying. A timestamp (milliseconds since 1970) is the safest format to store and compare. Timezones and daylight saving are where date bugs live — use a library (date-fns, Luxon) instead of hand-rolling the math.",
+  },
+  {
+    id: "caching",
+    topic: "Caching",
+    triggers: ["cache", "caching", "what is caching", "cache busting"],
+    answer:
+      "Caching stores a result so the next identical request skips the work. Browsers cache files, servers cache database results, CDNs cache pages near the user. The hard part is knowing when the cached copy is stale — give cached things a short lifetime or a version in the name so a new deploy busts it.",
+  },
+  {
+    id: "file-handling",
+    topic: "File handling",
+    triggers: ["read file", "write file", "file upload", "fs.readfile", "handle files"],
+    answer:
+      "Read files with the fs module (Node) or an upload handler (browser). Always check the file exists before reading, and cap upload sizes — a 2 GB upload will kill a small server. Store uploads outside the code repo, validate the file type by content (not just the extension), and never execute an uploaded file.",
+  },
+  {
+    id: "telegram-commands",
+    topic: "Telegram bot commands",
+    triggers: ["telegram command", "bot commands", "setmycommands", "telegram menu", "telegram bot commands"],
+    answer:
+      "Telegram bot commands are the /words users type. Define them with @BotFather via /setcommands so Telegram shows them in a menu. In code, match the command text at the start of the message and reply. Keep command names short, lowercase, and one job each.",
+  },
+  {
+    id: "discord-embeds",
+    topic: "Discord embeds",
+    triggers: ["discord embed", "embed", "rich embed", "discord message embed"],
+    answer:
+      "An embed is Discord's rich message card — title, description, color bar, fields, thumbnail, footer. Build one with the EmbedBuilder in discord.js and send it instead of plain text for anything structured (a product, a result, a profile). One message can hold up to 10 embeds and 6000 characters total.",
+  },
+  {
+    id: "discord-intents",
+    topic: "Discord intents",
+    triggers: ["discord intents", "intents", "gateway intents", "privileged intents", "message content intent"],
+    answer:
+      "Intents tell Discord which events your bot wants to receive. MessageContent (privileged) is the one that lets a bot read message text — turn it on in the Developer Portal and request it in code, or your bot sees nothing. Only ask for the intents you actually use; unused privileged intents are a review risk.",
+  },
 ];
 
 /** Normalize text for matching: lowercase, collapse whitespace and punctuation. */
@@ -235,7 +508,11 @@ export function normalizeQuery(text: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
-    .trim();
+    .trim()
+    .replace(/\bwhats\b/g, "what is")
+    .replace(/\bwhat s\b/g, "what is")
+    .replace(/\bhows\b/g, "how is")
+    .replace(/\bhow s\b/g, "how is");
 }
 
 export type KnowledgeMatch = { entry: KnowledgeEntry; score: number };
