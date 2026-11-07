@@ -8,8 +8,8 @@ import { SquareCardForm, type SquareCardFormHandle } from "@/components/site/squ
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSquareConfig, submitOrder } from "@/lib/cms/public";
-import type { SquarePublicConfig } from "@/lib/payments/square";
+import { submitOrder } from "@/lib/cms/public";
+import { squareClientConfig } from "@/lib/payments/square";
 import { pageHead, siteFromMatches } from "@/lib/seo";
 import { formatUsd } from "@/lib/utils";
 import { cartTotal, useCart } from "@/stores/cart";
@@ -41,22 +41,13 @@ function CartPage() {
   const [couponBusy, setCouponBusy] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const finalTotal = Math.max(0, Math.round((total - (coupon?.discount ?? 0)) * 100) / 100);
-  const [squareConfig, setSquareConfig] = useState<SquarePublicConfig | null>(null);
+  // Public Square config is inlined at build time (VITE_ vars), so the card
+  // form does not depend on a server round-trip to appear.
+  const squareConfig = squareClientConfig();
   const cardRef = useRef<SquareCardFormHandle>(null);
   // Card payment is live only when Square is connected and there is a
   // chargeable total; a $0 total (full promo) skips the card entirely.
   const payByCard = squareConfig !== null && finalTotal > 0;
-
-  // Load the public Square config once; the card form mounts from it.
-  useEffect(() => {
-    let cancelled = false;
-    void getSquareConfig().then((config) => {
-      if (!cancelled) setSquareConfig(config);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   async function applyCoupon(code: string) {
     const trimmed = code.trim();
