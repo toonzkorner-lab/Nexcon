@@ -16,3 +16,18 @@ export function configuredDirectProviders(
   if (env.TWITTER_CLIENT_ID?.trim() && env.TWITTER_CLIENT_SECRET?.trim()) out.push("twitter");
   return out;
 }
+
+/**
+ * Which direct providers the login page should OFFER, from the build-time
+ * VITE_ flags. The server registers a provider only when its client id AND
+ * secret are set; the matching VITE_ flag is set alongside them so the button
+ * never appears for a provider that isn't wired up. Pure + testable.
+ */
+export function visibleDirectProviders(
+  env: Record<string, string | undefined>,
+): DirectProviderId[] {
+  const out: DirectProviderId[] = [];
+  if (env.VITE_AUTH_DIRECT_GOOGLE === "true") out.push("google");
+  if (env.VITE_AUTH_DIRECT_TWITTER === "true") out.push("twitter");
+  return out;
+}
