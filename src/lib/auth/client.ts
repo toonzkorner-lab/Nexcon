@@ -2,6 +2,7 @@ import { genericOAuthClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { runPreSignInSignOut, runSignOut } from "../../../scripts/sign-out-plan.mjs";
 import { DIRECT_PROVIDERS, GROK_PROVIDERS } from "./providers";
+import { visibleDirectProviders } from "./direct-providers";
 
 /**
  * Better Auth client for this React SPA (browser-side).
@@ -44,6 +45,14 @@ export const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== "false";
  * `TWITTER_CLIENT_ID`/`TWITTER_CLIENT_SECRET`) are set there.
  */
 export const directSocialEnabled = import.meta.env.VITE_AUTH_DIRECT_SOCIAL === "true";
+
+/**
+ * The direct providers whose buttons the login page offers. Each entry needs
+ * its own VITE_ flag (`VITE_AUTH_DIRECT_GOOGLE` / `VITE_AUTH_DIRECT_TWITTER`),
+ * set alongside the matching server client id/secret — so a button never
+ * appears for a provider that isn't wired up.
+ */
+export const visibleDirectProviderIds = visibleDirectProviders(import.meta.env);
 
 /** The upstream providers to render sign-in buttons for. */
 export { DIRECT_PROVIDERS, GROK_PROVIDERS };
