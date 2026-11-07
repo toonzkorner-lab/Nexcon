@@ -36,6 +36,7 @@ import { getCookie } from "@tanstack/react-start/server";
 import { randomBytes } from "node:crypto";
 import { Pool } from "pg";
 import { ensureDbReady, getPglite } from "../db";
+import { configuredDirectProviders } from "./direct-providers";
 import { emailAndPasswordEnabled } from "./email-password";
 import { GATE_PROVIDER_ID, gateIdentitySessions } from "./gate-session.server";
 import { GROK_PROVIDERS } from "./providers";
@@ -80,6 +81,16 @@ const authDisabled = env("VITE_AUTH_ENABLED") === "false";
 const grokIssuer = env("GROK_AUTH_ISSUER") ?? GROK_ISSUER_DEFAULT;
 const grokClientId = env("GROK_AUTH_CLIENT_ID") ?? PREVIEW_CLIENT_ID;
 const grokClientSecret = env("GROK_AUTH_CLIENT_SECRET") ?? PREVIEW_CLIENT_SECRET;
+
+// Direct social logins (owner's own OAuth apps, so the consent screen says
+// "N3xUs Konc3pt'z" instead of "grok app builder"). Enabled only when the
+// matching client id + secret are set; otherwise the broker providers below
+// stay the way in. Callback URLs to register in each app's dashboard:
+//   Google: https://<host>/api/auth/callback/google
+//   X:      https://<host>/api/auth/callback/twitter
+const directProviders = configuredDirectProviders(process.env);
+const directGoogle = directProviders.includes("google");
+const directTwitter = directProviders.includes("twitter");
 
 /** True when federated sign-in is active (real auth is enforced). */
 export const authConfigured =
@@ -222,12 +233,37 @@ export const auth = betterAuth({
       enabled: true,
       trustedProviders: [
         ...GROK_PROVIDERS.map((p) => p.providerId),
+        ...(directGoogle ? ["google"] : []),
+        ...(directTwitter ? ["twitter"] : []),
         GATE_PROVIDER_ID,
       ],
       // X's synthetic email is never "verified", so don't gate linking on the
       // local user's email-verified state.
       requireLocalEmailVerified: false,
     },
+  },
+
+  // Direct social logins (owner's own OAuth apps). Only the providers whose
+  // credentials are set get registered, so the broker buttons keep working
+  // until the owner wires his own apps up. This version of Better Auth takes
+  // the options object here (not a provider instance).
+  socialProviders: {
+    ...(directGoogle
+      ? {
+          google: {
+            clientId: env("GOOGLE_CLIENT_ID") as string,
+            clientSecret: env("GOOGLE_CLIENT_SECRET") as string,
+          },
+        }
+      : {}),
+    ...(directTwitter
+      ? {
+          twitter: {
+            clientId: env("TWITTER_CLIENT_ID") as string,
+            clientSecret: env("TWITTER_CLIENT_SECRET") as string,
+          },
+        }
+      : {}),
   },
 
   // Cache the session in the short-lived signed `session_data` cookie so reads
