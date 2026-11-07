@@ -29,3 +29,17 @@ export const GROK_PROVIDERS: readonly GrokProvider[] = [
   { providerId: "grok-google", idp: "google", label: "Google" },
   { providerId: "grok-x", idp: "twitter", label: "X" },
 ];
+
+/**
+ * The owner's own OAuth apps (direct social login, no broker). The consent
+ * screen for these says "N3xUs Konc3pt'z". Shown when the client flag
+ * `VITE_AUTH_DIRECT_SOCIAL=true` is set (once the direct client ids/secrets
+ * are in Vercel env). `providerId` is Better Auth's social id — X is still
+ * `twitter` there.
+ */
+export type DirectProvider = { providerId: "google" | "twitter"; label: string };
+
+export const DIRECT_PROVIDERS: readonly DirectProvider[] = [
+  { providerId: "google", label: "Google" },
+  { providerId: "twitter", label: "X" },
+];
