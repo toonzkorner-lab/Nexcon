@@ -940,8 +940,8 @@ export async function insertOrder(input: Omit<Order, "id" | "status" | "createdA
   const sql = await getSql();
   const id = uid("ord");
   await sql.query(
-    `insert into orders (id, email, channel, total, items, coupon_code, discount, status) values ($1,$2,$3,$4,$5::jsonb,$6,$7,'queued')`,
-    [id, input.email, input.channel, input.total, j(input.items), input.couponCode ?? "", input.discount ?? 0],
+    `insert into orders (id, email, channel, total, items, coupon_code, discount, payment_id, payment_provider, status) values ($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,'queued')`,
+    [id, input.email, input.channel, input.total, j(input.items), input.couponCode ?? "", input.discount ?? 0, input.paymentId ?? "", input.paymentProvider ?? ""],
   );
   return { ...input, id, status: "queued", createdAt: new Date().toISOString() };
 }
