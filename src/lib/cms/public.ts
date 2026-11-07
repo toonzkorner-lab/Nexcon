@@ -1,12 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { insertBrief, insertMessage, insertOrder, insertReview, readSite } from "./db";
 import { applyCouponToOrder } from "@/lib/owner-coupons";
+import {
+  chargeSquare,
+  dollarsToCents,
+  squareConfig,
+  squarePublicConfig,
+} from "@/lib/payments/square";
 
 export const loadSite = createServerFn({ method: "GET" }).handler(async () => {
   return readSite(true);
+});
+
+/** Public Square config for the browser card form (no secrets). Null when unset. */
+export const getSquareConfig = createServerFn({ method: "GET" }).handler(async () => {
+  return squarePublicConfig(process.env);
 });
 
 // Honeypot field shared by every public form. Real users never see it; bots
@@ -92,12 +104,16 @@ export const submitOrder = createServerFn({ method: "POST" })
           }),
         ).min(1).max(40),
         coupon: z.string().trim().max(24).optional(),
+        // Single-use Square card token from the browser SDK. When present
+        // and the total is above $0, the card is charged before the order
+        // is recorded; a failed charge records nothing.
+        sourceId: z.string().trim().max(200).optional(),
         website: websiteHoneypot,
       }).parse(input),
   )
   .handler(async ({ data }) => {
     limitCaller("form:order", 5);
-    const { website, coupon, ...rest } = data;
+    const { website, coupon, sourceId, ...rest } = data;
     if (website) return { ...honeypotOk(), ...rest, total: 0 };
 
     // Recompute the total from authoritative product prices. Client prices
@@ -126,12 +142,34 @@ export const submitOrder = createServerFn({ method: "POST" })
     // is never trusted from the client.
     const applied = await applyCouponToOrder(coupon, serverTotal);
     const finalTotal = Math.round((serverTotal - applied.discount) * 100) / 100;
+
+    // Card payment: charge first, record the order only on success.
+    let paymentId = "";
+    let paymentProvider = "";
+    if (sourceId && finalTotal > 0) {
+      const config = squareConfig(process.env);
+      if (!config) {
+        throw new Response("Card payments are not connected.", { status: 503 });
+      }
+      const charge = await chargeSquare(config, {
+        sourceId,
+        amountCents: dollarsToCents(finalTotal),
+        idempotencyKey: randomUUID(),
+        note: `N3xUs order for ${rest.email}`,
+        buyerEmail: rest.email,
+      });
+      paymentId = charge.paymentId;
+      paymentProvider = "square";
+    }
+
     return insertOrder({
       ...rest,
       items,
       total: finalTotal,
       couponCode: applied.code,
       discount: applied.discount,
+      paymentId,
+      paymentProvider,
     });
   });
 
