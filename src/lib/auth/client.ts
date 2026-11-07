@@ -1,7 +1,7 @@
 import { genericOAuthClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { runPreSignInSignOut, runSignOut } from "../../../scripts/sign-out-plan.mjs";
-import { GROK_PROVIDERS } from "./providers";
+import { DIRECT_PROVIDERS, GROK_PROVIDERS } from "./providers";
 
 /**
  * Better Auth client for this React SPA (browser-side).
@@ -37,8 +37,32 @@ export const authClient = createAuthClient({
  */
 export const authEnabled = import.meta.env.VITE_AUTH_ENABLED !== "false";
 
+/**
+ * True when the login page should offer the owner's own direct Google/X apps
+ * instead of the broker. Set `VITE_AUTH_DIRECT_SOCIAL=true` in Vercel once
+ * the direct client ids/secrets (`GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`,
+ * `TWITTER_CLIENT_ID`/`TWITTER_CLIENT_SECRET`) are set there.
+ */
+export const directSocialEnabled = import.meta.env.VITE_AUTH_DIRECT_SOCIAL === "true";
+
 /** The upstream providers to render sign-in buttons for. */
-export { GROK_PROVIDERS };
+export { DIRECT_PROVIDERS, GROK_PROVIDERS };
+
+/**
+ * Start sign-in with the owner's own direct Google/X OAuth app.
+ * Full-page redirect to the provider; the consent screen says
+ * "N3xUs Konc3pt'z" because the OAuth app is his, not the broker's.
+ */
+export async function signInDirect(
+  providerId: "google" | "twitter",
+  opts: { callbackURL?: string } = {},
+): Promise<void> {
+  const { error } = await authClient.signIn.social({
+    provider: providerId,
+    callbackURL: opts.callbackURL ?? "/",
+  });
+  if (error) throw new Error(error.message ?? "Sign-in failed");
+}
 
 // ── Live-preview bearer token ────────────────────────────────────────────────
 // The embedded preview iframe has partitioned cookies, so we keep the session's
