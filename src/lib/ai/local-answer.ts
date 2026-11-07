@@ -77,6 +77,10 @@ export function answerLocally(input: LocalAnswerInput): string {
     return `${contactLine} For a job, ${bookLine.toLowerCase()}`;
   }
   if (BOOK_WORDS.test(q) && !HOW_TO.test(q)) {
+    // Core can take the brief right in the chat; Relay just points to /book.
+    if (botName === "Core") {
+      return `I can take it right here — say "start a project" and I'll walk you through the brief. Or open a brief at /book if you'd rather use the form.`;
+    }
     return bookLine;
   }
   if (PRICE_WORDS.test(q)) {
