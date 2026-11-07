@@ -8,6 +8,7 @@ import {
   directSocialEnabled,
   signIn,
   signInDirect,
+  visibleDirectProviderIds,
 } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,7 +131,7 @@ function Login() {
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-fg-subtle">Or continue with</p>
               <div className="mt-3 flex flex-col gap-2">
                 {directSocialEnabled
-                  ? DIRECT_PROVIDERS.map((p) => (
+                  ? DIRECT_PROVIDERS.filter((p) => visibleDirectProviderIds.includes(p.providerId)).map((p) => (
                       <button
                         key={p.providerId}
                         type="button"
