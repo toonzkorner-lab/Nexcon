@@ -28,7 +28,9 @@ export const XAI_CONFIG: ProviderConfig = {
 
 export const GEMINI_CONFIG: ProviderConfig = {
   baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
-  model: "gemini-2.5-flash",
+  // 2.5 Flash is retired for new keys — 3.5 Flash-Lite is the free,
+  // verified-working replacement (tested 2026-11-07).
+  model: "gemini-3.5-flash-lite",
   envKey: "GEMINI_API_KEY",
 };
 
