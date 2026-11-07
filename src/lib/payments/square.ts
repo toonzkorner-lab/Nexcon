@@ -87,6 +87,29 @@ export function squarePublicConfig(
   };
 }
 
+/**
+ * Public config for the browser, read from Vite env vars inlined at build
+ * time. This is the primary source for the card form — it does not depend
+ * on a server round-trip, so a failed config fetch can never silently hide
+ * the form. The values are public (application id, location id,
+ * environment); the secret access token stays server-only. `env` is
+ * injectable so tests can pass values without a Vite runtime.
+ */
+export function squareClientConfig(
+  env: Record<string, string | undefined> = (import.meta as {
+    env?: Record<string, string | undefined>;
+  }).env ?? {},
+): SquarePublicConfig | null {
+  const applicationId = (env["VITE_SQUARE_APPLICATION_ID"] ?? "").trim();
+  const locationId = (env["VITE_SQUARE_LOCATION_ID"] ?? "").trim();
+  if (!applicationId || !locationId) return null;
+  return {
+    applicationId,
+    locationId,
+    environment: parseSquareEnvironment(env["VITE_SQUARE_ENVIRONMENT"]),
+  };
+}
+
 /** API base URL for an environment. */
 export function squareApiBase(environment: SquareEnvironment): string {
   return SQUARE_API_BASES[environment];
