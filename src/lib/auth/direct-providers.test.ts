@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { configuredDirectProviders } from "./direct-providers.ts";
+import { configuredDirectProviders, visibleDirectProviders } from "./direct-providers.ts";
 
 describe("configuredDirectProviders", () => {
   it("returns both when both id + secret are set", () => {
@@ -36,6 +36,36 @@ describe("configuredDirectProviders", () => {
         GOOGLE_CLIENT_ID: "   ",
         GOOGLE_CLIENT_SECRET: "g-secret",
       }),
+      [],
+    );
+  });
+});
+
+describe("visibleDirectProviders", () => {
+  it("returns only the providers whose VITE_ flag is true", () => {
+    assert.deepEqual(
+      visibleDirectProviders({
+        VITE_AUTH_DIRECT_GOOGLE: "true",
+        VITE_AUTH_DIRECT_TWITTER: "false",
+      }),
+      ["google"],
+    );
+  });
+
+  it("returns both when both flags are true", () => {
+    assert.deepEqual(
+      visibleDirectProviders({
+        VITE_AUTH_DIRECT_GOOGLE: "true",
+        VITE_AUTH_DIRECT_TWITTER: "true",
+      }),
+      ["google", "twitter"],
+    );
+  });
+
+  it("returns none when no flag is true", () => {
+    assert.deepEqual(visibleDirectProviders({}), []);
+    assert.deepEqual(
+      visibleDirectProviders({ VITE_AUTH_DIRECT_GOOGLE: "yes" }),
       [],
     );
   });
