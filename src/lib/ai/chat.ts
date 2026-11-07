@@ -3,7 +3,9 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { assertRateLimit } from "@/lib/rate-limit.server";
 import { getPublishedBot, readSite } from "@/lib/cms/db";
+import { seedSite } from "@/lib/cms/seed-data";
 import { formatUsd } from "@/lib/utils";
+import { answerLocally } from "./local-answer";
 
 const MAX_USER_TURNS = 12;
 const MAX_MSG = 500;
@@ -29,17 +31,33 @@ export const askCore = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     assertRateLimit(getRequest().headers, "ai:ask", 10, 60_000);
     const apiKey = process.env.XAI_API_KEY;
-    if (!apiKey) {
-      return { ok: false as const, error: "Core is offline in this environment." };
-    }
-    let catalog = "";
+    // Site data drives both the LLM catalog and the no-key local answers.
+    // If the DB read fails, fall back to the seed site so the desk still answers.
+    let site;
     try {
-      const site = await readSite(true);
-      const services = site.services
-        .map((s) => `- ${s.name} ${formatUsd(s.price, { monthly: s.billing === "monthly" })}`)
-        .join("\n");
-      const store = site.products.map((p) => `- ${p.name} ${formatUsd(p.price)}`).join("\n");
-      catalog = `You are N3xUs Core, the studio assistant for ${site.settings.studioName} — run by ${site.settings.founderName}. Voice: short, specific, no hype, no emoji.
+      site = await readSite(true);
+    } catch {
+      site = seedSite();
+    }
+    // No key: answer locally off the site's own data + coding knowledge.
+    if (!apiKey) {
+      return {
+        ok: true as const,
+        text: answerLocally({
+          botName: "Core",
+          settings: site.settings,
+          services: site.services,
+          products: site.products,
+          faqs: site.faqs,
+          messages: data.messages,
+        }),
+      };
+    }
+    const services = site.services
+      .map((s) => `- ${s.name} ${formatUsd(s.price, { monthly: s.billing === "monthly" })}`)
+      .join("\n");
+    const store = site.products.map((p) => `- ${p.name} ${formatUsd(p.price)}`).join("\n");
+    const catalog = `You are N3xUs Core, the studio assistant for ${site.settings.studioName} — run by ${site.settings.founderName}. Voice: short, specific, no hype, no emoji.
 
 The 3 D's: Design, Development, Deployment.
 
@@ -54,10 +72,6 @@ Live bot demos sit at /lab. Ledger is a Discord economy sandbox. Relay is a Tele
 Channels: Discord ${site.settings.discordUrl} and Telegram ${site.settings.telegramUrl}. ${site.settings.sla}.
 
 Help visitors pick a service, estimate fit, and point them to Open a brief (/book) or Contact. Do not invent case studies, client names, or prices. If you don't know, say so. Keep replies under 180 words.`;
-    } catch {
-      catalog =
-        "You are N3xUs Core. Point visitors to /book, /contact, or /lab. Do not invent prices. Keep replies under 180 words.";
-    }
 
     const res = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
@@ -110,8 +124,25 @@ export const talkToBot = createServerFn({ method: "POST" })
     if (!bot) return { ok: false as const, error: "That demo is offline." };
 
     const apiKey = process.env.XAI_API_KEY;
+    // No key: answer locally off the site's own data + coding knowledge.
     if (!apiKey) {
-      return { ok: false as const, error: "This demo’s language model is offline. Slash commands still run locally." };
+      let site;
+      try {
+        site = await readSite(true);
+      } catch {
+        site = seedSite();
+      }
+      return {
+        ok: true as const,
+        text: answerLocally({
+          botName: bot.name,
+          settings: site.settings,
+          services: site.services,
+          products: site.products,
+          faqs: site.faqs,
+          messages: data.messages,
+        }),
+      };
     }
 
     const system = `${bot.persona}
