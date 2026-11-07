@@ -130,7 +130,7 @@ export function answerLocally(input: LocalAnswerInput): string {
 
   return (
     `I can help with hours, services, prices, starting a project, or coding questions ` +
-    `(Discord and Telegram bots, React, JavaScript, hosting, and more). ` +
+    `(Discord and Telegram bots, JavaScript, Python, React, databases, hosting, and more). ` +
     `For anything else, ${bookLine.toLowerCase()} or ${contactLine.toLowerCase()}`
   );
 }
