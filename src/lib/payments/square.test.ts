@@ -4,6 +4,7 @@ import {
   dollarsToCents,
   parseSquareEnvironment,
   squareApiBase,
+  squareClientConfig,
   squareConfig,
   squareErrorMessage,
   squarePublicConfig,
@@ -67,6 +68,27 @@ describe("squarePublicConfig", () => {
   it("returns null when the application id is missing", () => {
     const { SQUARE_APPLICATION_ID: _drop, ...rest } = FULL_ENV;
     assert.equal(squarePublicConfig(rest), null);
+  });
+});
+
+describe("squareClientConfig", () => {
+  it("reads the public config from Vite env vars", () => {
+    assert.deepEqual(
+      squareClientConfig({
+        VITE_SQUARE_APPLICATION_ID: "app-1",
+        VITE_SQUARE_LOCATION_ID: "loc-1",
+        VITE_SQUARE_ENVIRONMENT: "sandbox",
+      }),
+      { applicationId: "app-1", locationId: "loc-1", environment: "sandbox" },
+    );
+  });
+
+  it("returns null when the Vite vars are missing", () => {
+    assert.equal(squareClientConfig({}), null);
+    assert.equal(
+      squareClientConfig({ VITE_SQUARE_APPLICATION_ID: "app-1" }),
+      null,
+    );
   });
 });
 
