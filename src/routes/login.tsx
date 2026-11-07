@@ -1,6 +1,14 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { GROK_PROVIDERS, authClient, authEnabled, signIn } from "@/lib/auth/client";
+import {
+  DIRECT_PROVIDERS,
+  GROK_PROVIDERS,
+  authClient,
+  authEnabled,
+  directSocialEnabled,
+  signIn,
+  signInDirect,
+} from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -121,16 +129,27 @@ function Login() {
             <div className="mt-8">
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-fg-subtle">Or continue with</p>
               <div className="mt-3 flex flex-col gap-2">
-                {GROK_PROVIDERS.map((p) => (
-                  <button
-                    key={p.providerId}
-                    type="button"
-                    onClick={() => void signIn(p.providerId, { callbackURL: "/owner" })}
-                    className="h-11 rounded-[var(--radius-md)] text-sm text-fg shadow-[var(--shadow-border)] transition-[box-shadow] hover:shadow-[var(--shadow-border-hover)]"
-                  >
-                    Continue with {p.label}
-                  </button>
-                ))}
+                {directSocialEnabled
+                  ? DIRECT_PROVIDERS.map((p) => (
+                      <button
+                        key={p.providerId}
+                        type="button"
+                        onClick={() => void signInDirect(p.providerId, { callbackURL: "/owner" })}
+                        className="h-11 rounded-[var(--radius-md)] text-sm text-fg shadow-[var(--shadow-border)] transition-[box-shadow] hover:shadow-[var(--shadow-border-hover)]"
+                      >
+                        Continue with {p.label}
+                      </button>
+                    ))
+                  : GROK_PROVIDERS.map((p) => (
+                      <button
+                        key={p.providerId}
+                        type="button"
+                        onClick={() => void signIn(p.providerId, { callbackURL: "/owner" })}
+                        className="h-11 rounded-[var(--radius-md)] text-sm text-fg shadow-[var(--shadow-border)] transition-[box-shadow] hover:shadow-[var(--shadow-border-hover)]"
+                      >
+                        Continue with {p.label}
+                      </button>
+                    ))}
               </div>
             </div>
           </>
