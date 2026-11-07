@@ -29,9 +29,16 @@ for (const dir of dests) {
   for (const file of files) {
     const src = join(dist, file);
     if (!existsSync(src)) continue;
-    copyFileSync(src, join(dir, file));
-    console.log(`[copy-pglite-data] copied ${file} -> ${dir}`);
-    copied++;
+    try {
+      copyFileSync(src, join(dir, file));
+      console.log(`[copy-pglite-data] copied ${file} -> ${dir}`);
+      copied++;
+    } catch (err) {
+      // Never fail the build: a missing WASM file only breaks the PGLite
+      // fallback (no DATABASE_URL), not the static site. Log it loud so a
+      // failed copy shows up in the deploy log instead of silently 500ing.
+      console.error(`[copy-pglite-data] FAILED to copy ${file} -> ${dir}:`, err);
+    }
   }
 }
 if (copied === 0) {
