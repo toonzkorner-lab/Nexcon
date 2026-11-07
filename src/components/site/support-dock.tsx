@@ -79,10 +79,6 @@ export function SupportDock() {
         return;
       }
       const res = await askCore({ data: { messages: next } });
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
       setMessages([...next, { role: "assistant", content: res.text }]);
     } catch {
       setError("Could not reach Core.");
