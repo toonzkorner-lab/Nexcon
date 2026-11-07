@@ -1,6 +1,8 @@
-import { Bot, LifeBuoy, MessageCircle, Send, X } from "lucide-react";
+import { Bot, Briefcase, LifeBuoy, MessageCircle, Send, X } from "lucide-react";
 import { useState } from "react";
 import { askCore } from "@/lib/ai/chat";
+import { advanceBrief, briefPayload, isBriefIntent, startBrief, type BriefState } from "@/lib/ai/brief-flow";
+import { submitBrief } from "@/lib/cms/public";
 import { useSite } from "@/lib/cms/use-site";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +11,8 @@ import { cn } from "@/lib/utils";
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 export function SupportDock() {
-  const { settings } = useSite();
+  const { settings, services } = useSite();
+  const groupNames = [...new Set(services.map((s) => s.group))];
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"menu" | "chat">("menu");
   const [messages, setMessages] = useState<ChatMsg[]>([
@@ -21,6 +24,14 @@ export function SupportDock() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [brief, setBrief] = useState<BriefState | null>(null);
+
+  function beginBrief() {
+    const started = startBrief(groupNames);
+    setBrief(started.state);
+    setMode("chat");
+    setMessages([{ role: "assistant", content: started.reply }]);
+  }
 
   async function send() {
     const text = draft.trim();
@@ -31,6 +42,42 @@ export function SupportDock() {
     setBusy(true);
     setError(null);
     try {
+      // Brief mode: the message answers the current brief question.
+      if (brief) {
+        const res = advanceBrief(brief, text, groupNames);
+        if (res.cancelled) {
+          setBrief(null);
+          setMessages([...next, { role: "assistant", content: res.reply }]);
+          return;
+        }
+        if (res.submit) {
+          try {
+            const row = await submitBrief({ data: briefPayload(res.state) });
+            setBrief(null);
+            setMessages([
+              ...next,
+              {
+                role: "assistant",
+                content: `Brief received at the desk. Reference: ${row.id}. The studio will reply to ${res.state.email} — usually within 24h on weekdays.`,
+              },
+            ]);
+          } catch {
+            // Keep the brief so the visitor can say "yes" again to retry.
+            setError("Could not send the brief. Say yes again to retry.");
+          }
+          return;
+        }
+        setBrief(res.state);
+        setMessages([...next, { role: "assistant", content: res.reply }]);
+        return;
+      }
+      // Booking intent in normal chat: start the brief right here.
+      if (isBriefIntent(text)) {
+        const started = startBrief(groupNames);
+        setBrief(started.state);
+        setMessages([...next, { role: "assistant", content: started.reply }]);
+        return;
+      }
       const res = await askCore({ data: { messages: next } });
       if (!res.ok) {
         setError(res.error);
@@ -77,6 +124,14 @@ export function SupportDock() {
               >
                 <Bot className="size-4 text-fg-muted" />
                 Chat with Core
+              </button>
+              <button
+                type="button"
+                onClick={beginBrief}
+                className="flex h-12 items-center gap-3 rounded-[var(--radius-md)] px-3 text-left text-sm hover:bg-bg-subtle"
+              >
+                <Briefcase className="size-4 text-fg-muted" />
+                Start a project
               </button>
               <a
                 href={settings.discordUrl}
