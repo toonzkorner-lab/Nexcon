@@ -1,13 +1,15 @@
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { trackAnalyticsEvent } from "@/lib/analytics/track";
 import { validateCoupon } from "@/lib/owner-coupons";
 import { PageHeader } from "@/components/site/page-header";
+import { SquareCardForm, type SquareCardFormHandle } from "@/components/site/square-card-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { submitOrder } from "@/lib/cms/public";
+import { getSquareConfig, submitOrder } from "@/lib/cms/public";
+import type { SquarePublicConfig } from "@/lib/payments/square";
 import { pageHead, siteFromMatches } from "@/lib/seo";
 import { formatUsd } from "@/lib/utils";
 import { cartTotal, useCart } from "@/stores/cart";
@@ -31,6 +33,7 @@ function CartPage() {
   const clear = useCart((s) => s.clear);
   const router = useRouter();
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderPaid, setOrderPaid] = useState(false);
   const [busy, setBusy] = useState(false);
   const total = cartTotal(items);
   const [couponInput, setCouponInput] = useState("");
@@ -38,6 +41,22 @@ function CartPage() {
   const [couponBusy, setCouponBusy] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const finalTotal = Math.max(0, Math.round((total - (coupon?.discount ?? 0)) * 100) / 100);
+  const [squareConfig, setSquareConfig] = useState<SquarePublicConfig | null>(null);
+  const cardRef = useRef<SquareCardFormHandle>(null);
+  // Card payment is live only when Square is connected and there is a
+  // chargeable total; a $0 total (full promo) skips the card entirely.
+  const payByCard = squareConfig !== null && finalTotal > 0;
+
+  // Load the public Square config once; the card form mounts from it.
+  useEffect(() => {
+    let cancelled = false;
+    void getSquareConfig().then((config) => {
+      if (!cancelled) setSquareConfig(config);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function applyCoupon(code: string) {
     const trimmed = code.trim();
@@ -79,6 +98,21 @@ function CartPage() {
     }
     setBusy(true);
     try {
+      // Tokenize the card first when paying by card; the server charges
+      // the token and records the order only on a successful charge.
+      let sourceId: string | undefined;
+      if (payByCard) {
+        try {
+          sourceId = await cardRef.current?.tokenize();
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Check the card details and try again.");
+          return;
+        }
+        if (!sourceId) {
+          toast.error("Check the card details and try again.");
+          return;
+        }
+      }
       const row = await submitOrder({
         data: {
           email,
@@ -86,15 +120,17 @@ function CartPage() {
           total,
           items: items.map((i) => ({ name: i.name, qty: i.qty, price: i.price })),
           coupon: coupon?.code,
+          sourceId,
         },
       });
       clear();
       setOrderId(row.id);
+      setOrderPaid(Boolean(sourceId));
       trackAnalyticsEvent("order_complete");
-      toast.success("Order queued for fulfillment.");
+      toast.success(payByCard ? "Payment complete. Order queued for fulfillment." : "Order queued for fulfillment.");
       await router.invalidate();
     } catch {
-      toast.error("Could not queue the order.");
+      toast.error(payByCard ? "The card could not be charged." : "Could not queue the order.");
     } finally {
       setBusy(false);
     }
@@ -106,7 +142,8 @@ function CartPage() {
         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-signal">Queued</p>
         <h1 className="mt-4 text-4xl font-light">Order {orderId}</h1>
         <p className="mt-4 text-sm leading-relaxed text-fg-muted">
-          Digital goods and retainers are fulfilled manually — we will send access, invoices, or a kickoff note to the email you gave. Card charges are not taken here; this is the studio queue.
+          Digital goods and retainers are fulfilled manually — we will send access, invoices, or a kickoff note to the email you gave.
+          {orderPaid ? " Your card was charged." : " Card charges are not taken here; this is the studio queue."}
         </p>
         <Link to="/store" className="mt-8 inline-flex h-11 items-center text-sm text-fg-muted hover:text-fg">
           Back to store
@@ -207,8 +244,17 @@ function CartPage() {
             <Label htmlFor="channel">Discord or Telegram (optional)</Label>
             <Input id="channel" name="channel" />
           </div>
+          {payByCard && squareConfig ? (
+            <div>
+              <Label>Card</Label>
+              <SquareCardForm ref={cardRef} config={squareConfig} />
+              <p className="mt-1 text-xs text-fg-subtle">
+                Charged securely by Square. The card number never touches this site.
+              </p>
+            </div>
+          ) : null}
           <Button type="submit" className="w-full" disabled={items.length === 0 || busy}>
-            {busy ? "Sending…" : "Place order"}
+            {busy ? "Sending…" : payByCard ? `Pay ${formatUsd(finalTotal)}` : "Place order"}
           </Button>
         </form>
       </div>
