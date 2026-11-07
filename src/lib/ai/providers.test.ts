@@ -45,12 +45,12 @@ describe("providerApiKey", () => {
 });
 
 describe("provider config", () => {
-  it("points Gemini at Google's OpenAI-compatible endpoint with 2.5 Flash", () => {
+  it("points Gemini at Google's OpenAI-compatible endpoint with 3.5 Flash-Lite", () => {
     assert.equal(
       GEMINI_CONFIG.baseUrl,
       "https://generativelanguage.googleapis.com/v1beta/openai",
     );
-    assert.equal(GEMINI_CONFIG.model, "gemini-2.5-flash");
+    assert.equal(GEMINI_CONFIG.model, "gemini-3.5-flash-lite");
     assert.equal(GEMINI_CONFIG.envKey, "GEMINI_API_KEY");
     assert.equal(
       chatCompletionsUrl("gemini"),
